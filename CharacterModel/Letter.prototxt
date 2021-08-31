@@ -1,0 +1,188 @@
+name: "LeNet"
+input: "data"
+input_dim: 1
+input_dim: 1
+input_dim: 32
+input_dim: 32
+
+layers {
+  name: "conv1_1"
+  type: CONVOLUTION
+  bottom: "data"
+  top: "conv1_1"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 20
+    stride: 1
+	kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layers {
+  name: "relu1_1"
+  type: RELU
+  bottom: "conv1_1"
+  top: "conv1_1"
+}
+
+layers {
+  name: "conv1_2"
+  type: CONVOLUTION
+  bottom: "conv1_1"
+  top: "conv1_2"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 20
+    stride: 1
+	kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layers {
+  name: "relu1_2"
+  type: RELU
+  bottom: "conv1_2"
+  top: "conv1_2"
+}
+
+layers {
+  name: "pool1"
+  type: POOLING
+  bottom: "conv1_2"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layers {
+  name: "conv2_1"
+  type: CONVOLUTION
+  bottom: "pool1"
+  top: "conv2_1"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 50
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layers {
+  name: "relu2_1"
+  type: RELU
+  bottom: "conv2_1"
+  top: "conv2_1"
+}
+
+layers {
+  name: "conv2_2"
+  type: CONVOLUTION
+  bottom: "conv2_1"
+  top: "conv2_2"
+  blobs_lr: 1
+  blobs_lr: 2
+  convolution_param {
+    num_output: 50
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layers {
+  name: "relu2_2"
+  type: RELU
+  bottom: "conv2_2"
+  top: "conv2_2"
+}
+
+layers {
+  name: "pool2"
+  type: POOLING
+  bottom: "conv2_2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+
+
+layers {
+  name: "ip1"
+  type: INNER_PRODUCT
+  bottom: "pool2"
+  top: "ip1"
+  blobs_lr: 1
+  blobs_lr: 2
+  inner_product_param {
+    num_output: 1000
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layers {
+  name: "relu1"
+  type: RELU
+  bottom: "ip1"
+  top: "ip1"
+}
+layers {
+  name: "ip2"
+  type: INNER_PRODUCT
+  bottom: "ip1"
+  top: "ip2"
+  blobs_lr: 1
+  blobs_lr: 2
+  inner_product_param {
+   num_output: 52
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layers {
+  name: "prob"
+  type: SOFTMAX
+  bottom: "ip2"
+  top: "prob"
+}
