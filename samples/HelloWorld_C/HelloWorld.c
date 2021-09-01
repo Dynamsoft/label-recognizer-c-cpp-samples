@@ -23,6 +23,8 @@ int main()
 	// If you want to use an offline license, please contact Dynamsoft Support: https://www.dynamsoft.com/company/contact/
 	// You can also request a 30-day trial license in the customer portal: https://www.dynamsoft.com/customer/license/trialLicense?product=dlr&utm_source=github&package=c_cpp
 	DLR_InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", error, 512);
+    
+    printf("License initialization: %s\n", error);
 
 	// 2.Create an instance of Label Recognizer.
     void* dlr = DLR_CreateInstance();

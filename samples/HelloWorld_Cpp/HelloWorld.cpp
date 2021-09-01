@@ -27,6 +27,7 @@ int main()
 	// You can also request a 30-day trial license in the customer portal: https://www.dynamsoft.com/customer/license/trialLicense?product=dlr&utm_source=github&package=c_cpp
 	CLabelRecognizer::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", error, 512);
 
+    cout << "License initialization: " << error << endl;
 
 	// 2.Create an instance of Label Recognizer.
 	CLabelRecognizer dlr;

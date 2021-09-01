@@ -1,7 +1,8 @@
 CC=gcc
 CCFLAGS=-c
 
-DLRLIB_PATH=../../lib/Linux
+DLRMODEL_PATH=../../CharacterModel
+DLRLIB_PATH=../../lib/linux
 LDFLAGS=-L $(DLRLIB_PATH) -Wl,-rpath=$(DLRLIB_PATH) -Wl,-rpath=./
 DLRLIB=-lDynamsoftLabelRecognizer
 
@@ -14,6 +15,7 @@ SOURCE=HelloWorld.cpp
 # build rule for target.
 $(TARGET): $(OBJECT)
 	$(CC) -o $(TARGET) $(OBJECT) $(STDLIB) $(DLRLIB) $(LDFLAGS)
+	cp -r $(DLRMODEL_PATH) $(DLRLIB_PATH)
 
 # target to build an object file
 $(OBJECT): $(SOURCE)
@@ -22,4 +24,4 @@ $(OBJECT): $(SOURCE)
 # the clean target
 .PHONY : clean
 clean: 
-	rm -f $(OBJECT) $(TARGET)
+	rm -f $(OBJECT) $(TARGET) -r $(DLRLIB_PATH)/CharacterModel
