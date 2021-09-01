@@ -1,5 +1,5 @@
 CC=gcc
-CCFLAGS=-c
+CCFLAGS=-c -std=c++11
 
 DLRLIB_PATH=../../lib/linux
 LDFLAGS=-L $(DLRLIB_PATH) -Wl,-rpath=$(DLRLIB_PATH) -Wl,-rpath=./
