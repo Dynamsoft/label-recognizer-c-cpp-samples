@@ -3,7 +3,7 @@
     {
       "DirectoryPath": "MRZCharacterModel",
       "FilterFilePath": "",
-      "Name": "NumberUppercase"
+      "Name": "MRZ"
     }
    ],
    "LabelRecognizerParameterArray" : [
@@ -19,7 +19,7 @@
                "ThreshValueCoefficient" : 15
             }
          ],
-         "CharacterModelName" : "NumberUppercase",
+         "CharacterModelName" : "MRZ",
          "LetterHeightRange" : [ 5, 1000, 1 ],
 		 "LineStringLengthRange" : [44, 44],
 		 "MaxLineCharacterSpacing" : 130,

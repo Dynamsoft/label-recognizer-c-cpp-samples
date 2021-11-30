@@ -15,7 +15,7 @@
 #include "DynamsoftCore.h"
 
 
-#define DLR_VERSION                  "2.0.0.0826"
+#define DLR_VERSION                  "2.2.0.1130"
 
 /**Recognition timeout*/
 #define DLRERR_RECOGNITION_TIMEOUT		-10026
@@ -258,6 +258,7 @@ typedef struct tagDLRRuntimeSettings
 	*/
 	char characterModelName[64];
 
+
 	/**Sets the reference region to search for text.*/
 	DLR_ReferenceRegion referenceRegion;
 
@@ -284,9 +285,19 @@ typedef struct tagDLRRuntimeSettings
 
 	/**Sets further modes.*/
 	DLR_FurtherModes furtherModes;
+	/**Sets the maximum amount of time (in milliseconds) .
+	*
+	* @par Value range:
+	* 	    [0, 0x7fffffff]
+	* @par Default value:
+	* 	    10000
+	* @par Remarks:
+	*	    If you want to stop reading after a certain period of time, you can use this parameter to set a timeout.
+	*/
+	int timeout;
 
 	/**Reserved memory for the struct.*/
-	char reserved[64];
+	char reserved[60];
 }DLR_RuntimeSettings;
 
 /**
@@ -364,7 +375,7 @@ typedef struct tagLineResult
 typedef struct tagDLRResult
 {
 	/**The name of the reference region used to recognize current result.*/
-	const char* refereneceRegionName;
+	const char* referenceRegionName;
 
 	/**The name of the text area used to recognize current result.*/
 	const char* textAreaName;
@@ -477,6 +488,22 @@ extern "C" {
 	*/
 	DLR_API int DLR_UpdateRuntimeSettings(void* recognizer, DLR_RuntimeSettings* pSettings, char errorMsgBuffer[], const int errorMsgBufferLen);
 
+
+	/**
+	* Initializes runtime settings with the settings in a given JSON string.
+	*
+	* @param [in] recognizer Handle of Dynamsoft DLR instance.
+	* @param [in] content A JSON string that represents the content of the settings.
+	* @param [in,out] errorMsgBuffer (Optional) The buffer is allocated by caller and the recommended length
+	* 				  is 256. The error message will be copied to the buffer.
+	* @param [in] errorMsgBufferLen (Optional) The length of the allocated buffer.
+	*
+	* @return Returns error code. Returns 0 if the function operates successfully. You can call
+	* 		   GetErrorString() to get detailed error message.
+	*
+	*/
+	DLR_API	int DLR_UpdateRuntimeSettingsFromString(void* recognizer, const char* content, char errorMsgBuffer[], int errorMsgBufferLen);
+
 	/**
 	* Reset runtime settings.
 	*
@@ -572,6 +599,19 @@ extern "C" {
 	DLR_API int DLR_OutputSettingsToFile(void* recognizer, const char* outputFilePath, const char* templateName);
 
 	/**
+	* Output DLRParameter settings into a file(JSON file).
+	*
+	* @param [in] recognizer Handle of Dynamsoft DLR instance.
+	* @param [in,out] content The output string which stores the contents of current settings.
+	* @param [in] contentLen The length of output string.
+	* @param [in] templateName The name of the template which is to be output.
+	*
+	* @return Returns error code. Returns 0 if the function operates successfully. You can call
+	* 		   DLR_GetErrorString() to get detailed error message.
+	*/
+	DLR_API int DLR_OutputSettingsToString(void* recognizer, char content[], const int contentLen, const char* templateName);
+
+	/**
 	* Recognizes text from memory buffer containing image pixels in defined format.
 	*
 	* @param [in] recognizer Handle of Dynamsoft DLR instance.
@@ -596,6 +636,20 @@ extern "C" {
 	*
 	*/
 	DLR_API int DLR_RecognizeByFile(void* recognizer, const char* fileName, const char* templateName);
+
+	/**
+	* Recognizes text from a specified image file in memory.
+	*
+	* @param [in] recognizer Handle of Dynamsoft DLR instance.
+	* @param [in] pFileBytes The image file bytes in memory.
+	* @param [in] fileSize The length of the file bytes in memory.
+	* @param [in] templateName The template name.
+	*
+	* @return Returns error code. Returns 0 if the function operates successfully. You can call
+	* 		   DLR_GetErrorString() to get detailed error message.
+	*
+	*/
+	DLR_API int DLR_RecognizeFileInMemory(void* recognizer, const unsigned char* pFileBytes, int fileSize, const char* templateName);
 
 	/**
 	* Get all recognized results.
@@ -704,6 +758,19 @@ namespace dynamsoft
 			int UpdateRuntimeSettings(DLR_RuntimeSettings* pSettings, char errorMsgBuffer[] = NULL, const int errorMsgBufferLen = 0);
 
 			/**
+			* Initializes runtime settings with the settings in a given JSON string.
+			*
+			* @param [in] content A JSON string that represents the content of the settings.
+			* @param [in,out] errorMsgBuffer (Optional) The buffer is allocated by caller and the recommended length
+			* 				  is 256. The error message will be copied to the buffer.
+			* @param [in] errorMsgBufferLen (Optional) The length of the allocated buffer.
+			*
+			* @return Returns error code. Returns 0 if the function operates successfully. You can call
+			* 		   GetErrorString() to get detailed error message.
+			*
+			*/
+			int UpdateRuntimeSettingsFromString(const char* content, char errorMsgBuffer[] = NULL, int errorMsgBufferLen = 0);
+			/**
 			* Reset runtime settings.
 			*
 			* @return Returns error code. Returns 0 if the function operates successfully. You can call
@@ -792,6 +859,18 @@ namespace dynamsoft
 			int OutputSettingsToFile(const char* outputFilePath, const char* templateName);
 
 			/**
+			* Output DLRParameter settings into a file(JSON file).
+			*
+			* @param [in,out] content The output string which stores the contents of current settings.
+			* @param [in] contentLen The length of output string.
+			* @param [in] templateName The name of the template which is to be output.
+			*
+			* @return Returns error code. Returns 0 if the function operates successfully. You can call
+			* 		   DLR_GetErrorString() to get detailed error message.
+			*/
+			int OutputSettingsToString(char content[], const int contentLen, const char* templateName);
+
+			/**
 			* Recognizes text from memory buffer containing image pixels in defined format.
 			*
 			* @param [in] pImageDate A struct of DLRImageData that represents an image.
@@ -814,6 +893,19 @@ namespace dynamsoft
 			*
 			*/
 			int RecognizeByFile(const char* fileName, const char* templateName);
+
+			/**
+			* Recognizes text from a specified image file in memory.
+			*
+			* @param [in] pFileBytes The image file bytes in memory.
+			* @param [in] fileSize The length of the file bytes in memory.
+			* @param [in] templateName The template name.
+			*
+			* @return Returns error code. Returns 0 if the function operates successfully. You can call
+			* 		   DLR_GetErrorString() to get detailed error message.
+			*
+			*/
+			int RecognizeFileInMemory(const unsigned char* pFileBytes, int fileSize, const char* templateName);
 
 			/**
 			* Get all recognized results.

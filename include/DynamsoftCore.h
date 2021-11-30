@@ -38,11 +38,17 @@
 /**Failed to read the TIFF image. */
 #define DMERR_TIFF_READ_FAILED			-10013
 
+/**The DIB (Device-Independent Bitmaps) buffer is invalid. */
+#define DMERR_DIB_BUFFER_INVALID			-10018
+
 /**Failed to read the PDF image. */
 #define DMERR_PDF_READ_FAILED			-10021
 
 /**The PDF DLL is missing. */
 #define DMERR_PDF_DLL_MISSING			-10022
+
+/**Recognition timeout. */
+#define DMERR_RECOGNITION_TIMEOUT			-10026
 
 /**Json parse failed*/
 #define DMERR_JSON_PARSE_FAILED		-10030 
