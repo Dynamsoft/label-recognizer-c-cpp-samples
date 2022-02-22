@@ -253,7 +253,7 @@ int main()
 	printf("Hints: Please input 'Q' or 'q' to quit the application.\n");
 
 	// 1.Initialize license.
-	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a 7-day free license. Note that network connection is required for this license to work.
+	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
 	// If you want to use an offline license, please contact Dynamsoft Support: https://www.dynamsoft.com/company/contact/
 	// You can also request a 30-day trial license in the customer portal: https://www.dynamsoft.com/customer/license/trialLicense?product=dlr&utm_source=github&package=c_cpp
 	CLabelRecognizer::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9",szErrorMsg, 512);
