@@ -264,7 +264,7 @@ int main()
 	CLabelRecognizer dlr;
 
 	// 3. Append config by a template json file.
-	int ret = dlr.AppendSettingsFromFile("wholeImgMRZTemplate.json");
+	int ret = dlr.AppendSettingsFromFile("MRZ.json");
 
 	while (1)
 	{	

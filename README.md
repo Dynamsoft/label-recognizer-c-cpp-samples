@@ -3,6 +3,7 @@
 This repository contains multiple samples that demonstrates how to use the [Dynamsoft Label Recognizer](https://www.dynamsoft.com/label-recognition/overview/) C/C++ Edition.
 
 ## Requirements
+
 - Windows
   - Windows 7, 8, 10, 2003, 2008, 2008 R2, 2012.
   - Visual Studio 2008 or above

@@ -15,7 +15,7 @@
 #include "DynamsoftCore.h"
 
 
-#define DLR_VERSION                  "2.2.0.1130"
+#define DLR_VERSION                  "2.2.10.0616"
 
 /**Recognition timeout*/
 #define DLRERR_RECOGNITION_TIMEOUT		-10026
