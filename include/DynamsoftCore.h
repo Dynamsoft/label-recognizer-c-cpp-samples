@@ -1,9 +1,7 @@
 #ifndef __DYNAMSOFT_CORE_H__
 #define __DYNAMSOFT_CORE_H__
 
-#define DYNAMSOFT_CORE_VERSION "1.0.0.0826"
-
-
+#define DYNAMSOFT_CORE_VERSION "2.0.1.0929"
 
 /**Successful. */
 #define DM_OK								0 
@@ -47,6 +45,8 @@
 /**The PDF DLL is missing. */
 #define DMERR_PDF_DLL_MISSING			-10022
 
+/** timeout. */
+#define DMERR_TIMEOUT					-10026
 /**Recognition timeout. */
 #define DMERR_RECOGNITION_TIMEOUT			-10026
 
@@ -80,6 +80,20 @@
 /**Failed to get mode's argument.*/
 #define DMERR_GET_MODE_ARGUMENT_ERROR  -10055
 
+/**No content has been detected.*/
+#define DDN_CONTENT_NOT_FOUND -10056
+
+/*The quardrilateral is invalid*/
+#define DDN_QUADRILATERAL_INVALID -10057
+
+/**Failed to save file.*/
+#define DMERR_FILE_SAVE_FAILED -10058
+
+/**The stage type is invalid.*/
+#define DMERR_STAGE_TYPE_INVALID -10059
+
+/**The image orientation is invalid.*/
+#define DMERR_IMAGE_ORIENTATION_INVALID -10060
 
 #ifndef _COMMON_PART1_
 #define _COMMON_PART1_
@@ -118,156 +132,8 @@
 #define DMERR_TRIAL_LICENSE -20010
 
 /**Failed to reach License Server.*/
-#define DMERR_FAILED_TO_REACH_LTS -20200
-
-/**Failed to reach License Server.*/
 #define DMERR_FAILED_TO_REACH_DLS -20200
 
-
-/**
-* @enum DM_DeploymentType
-*
-* Describes the deployment type.
-*/
-typedef enum DM_DeploymentType
-{
-	/**Server deployment type*/
-	DM_DT_SERVER = 1,
-
-	/**Desktop*/
-	DM_DT_DESKTOP = 2,
-
-	/**Embedded device deployment type*/
-	DM_DT_EMBEDDED_DEVICE = 6,
-
-	/**OEM deployment type*/
-	DM_DT_OEM = 7,
-
-	/**Mobile deployment type*/
-	DM_DT_MOBILE = 9
-}DM_DeploymentType;
-
-/**
-* @enum DM_LicenseModule
-*
-* Describes the license module.
-*/
-typedef enum DM_LicenseModule
-{
-	/**One-D barcodes license module*/
-	DM_LM_ONED = 1,
-
-	/**QR Code barcodes license module*/
-	DM_LM_QR_CODE = 2,
-
-	/**PDF417 barcodes license module*/
-	DM_LM_PDF417 = 3,
-
-	/**Datamatrix barcodes license module*/
-	DM_LM_DATAMATRIX = 4,
-
-	/**Aztec barcodes license module*/
-	DM_LM_AZTEC = 5,
-
-	/**MAXICODE barcodes license module*/
-	DM_LM_MAXICODE = 6,
-
-	/**Patch code barcodes license module*/
-	DM_LM_PATCHCODE = 7,
-
-	/**GS1 Databar barcodes license module*/
-	DM_LM_GS1_DATABAR = 8,
-
-	/**GS1 Composite barcodes license module*/
-	DM_LM_GS1_COMPOSITE = 9,
-
-	/**Postal code barcodes license module*/
-	DM_LM_POSTALCODE = 10,
-
-	/**DotCode barcodes license module*/
-	DM_LM_DOTCODE = 11,
-
-	/**Intermediate result license module*/
-	DM_LM_INTERMEDIATE_RESULT = 12,
-
-	/**Datamatrix DPM(Direct Part Marking) license module*/
-	DM_LM_DPM = 13,
-
-	/**Nonstandard barcodes license module*/
-	DM_LM_NONSTANDARD_BARCODE = 16
-}DM_LicenseModule;
-
-/**
-* @enum DM_UUIDGenerationMethod
-*
-* Describes the UUID generation method.
-*/
-typedef enum DM_UUIDGenerationMethod
-{
-	/**Generates UUID with randon values.*/
-	DM_UUIDGM_RANDOM = 1,
-
-	/**Generates UUID based on hardware info.*/
-	DM_UUIDGM_HARDWARE = 2
-}DM_UUIDGenerationMethod;
-
-/**
-* @enum DM_ChargeWay
-*
-* Describes the charge way.
-*/
-typedef enum DM_ChargeWay
-{
-	/**The charge way automatically determined by the license server.*/
-	DM_CW_AUTO = 0,
-
-	/**Charges by the count of devices.*/
-	DM_CW_DEVICE_COUNT = 1,
-
-	/**Charges by the count of barcode scans.*/
-	DM_CW_SCAN_COUNT = 2,
-
-	/**Charges by the count of concurrent devices.*/
-	DM_CW_CONCURRENT_DEVICE_COUNT = 3,
-
-	/**Charges by the count of app domains.*/
-	DM_CW_APP_DOMIAN_COUNT = 6,
-
-	/**Charges by the count of active devices.*/
-	DM_CW_ACTIVE_DEVICE_COUNT = 8,
-
-	/**Charges by the count of instances.*/
-	DM_CW_INSTANCE_COUNT = 9,
-
-	/**Charges by the count of concurrent instances.*/
-	DM_CW_CONCURRENT_INSTANCE_COUNT = 10
-}DM_ChargeWay;
-
-/**
-* @enum Product
-*
-* Describes the Product.
-*/
-typedef enum Product
-{
-	/** Dynamsoft Barcode Reader */
-	PROD_DBR = 0x01,
-
-	/** Dynamsoft Label Recognition */
-	PROD_DLR = 0x02,
-
-	/** Dynamic Web Twain */
-	PROD_DWT = 0x04,
-
-	/** Dynamsoft Camera Enhancer */
-	PROD_DCE = 0x08,
-
-	/** Dynamsoft Panorama */
-	PROD_DPS = 0x10,
-
-	/** All Products */
-	PROD_ALL = 0xffff
-}Product;
 
 #endif
 
@@ -373,6 +239,7 @@ typedef enum RegionPredetectionMode
 	/**Detects region using the general algorithm based on HSV colour contrast*/
 	RPM_GENERAL_HSV_CONTRAST = 0x10,
 
+	RPM_MANUAL_SPECIFICATION = 0x20,
 	/**Reserved setting for region predection mode.*/
 #if defined(_WIN32) || defined(_WIN64)
 	RPM_REV = 0x80000000,
@@ -491,6 +358,7 @@ typedef enum TextureDetectionMode
 
 }TextureDetectionMode;
 
+
 /**
 * @enum PDFReadingMode
 *
@@ -525,13 +393,13 @@ typedef enum BarcodeFormat
 {
 	/**All supported formats in BarcodeFormat group 1*/
 #if defined(_WIN32) || defined(_WIN64)
-	BF_ALL = 0xFE1FFFFF,
+	BF_ALL = 0xFE3FFFFF,
 #else
-	BF_ALL = -31457281,
+	BF_ALL = -29360129,
 #endif
 
-	/**Combined value of BF_CODABAR, BF_CODE_128, BF_CODE_39, BF_CODE_39_Extended, BF_CODE_93, BF_EAN_13, BF_EAN_8, INDUSTRIAL_25, BF_ITF, BF_UPC_A, BF_UPC_E, BF_MSI_CODE;  */
-	BF_ONED = 0x001007FF,
+	/**Combined value of BF_CODABAR, BF_CODE_128, BF_CODE_39, BF_CODE_39_Extended, BF_CODE_93, BF_EAN_13, BF_EAN_8, INDUSTRIAL_25, BF_ITF, BF_UPC_A, BF_UPC_E, BF_MSI_CODE ,BF_ONED;  */
+	BF_ONED = 0x003007FF,
 
 	/**Combined value of BF_GS1_DATABAR_OMNIDIRECTIONAL, BF_GS1_DATABAR_TRUNCATED, BF_GS1_DATABAR_STACKED, BF_GS1_DATABAR_STACKED_OMNIDIRECTIONAL, BF_GS1_DATABAR_EXPANDED, BF_GS1_DATABAR_EXPANDED_STACKED, BF_GS1_DATABAR_LIMITED*/
 	BF_GS1_DATABAR = 0x0003F800,
@@ -624,10 +492,15 @@ typedef enum BarcodeFormat
 	/**MSI Code*/
 	BF_MSI_CODE = 0x100000,
 
+	/*Code 11*/
+	BF_CODE_11 = 0x200000,
+
+
 	/**No barcode format in BarcodeFormat group 1*/
 	BF_NULL = 0x00
 
 }BarcodeFormat;
+
 
 /**
 * @enum BarcodeFormat_2
@@ -640,47 +513,48 @@ typedef enum BarcodeFormat_2
 	/**No barcode format in BarcodeFormat group 2*/
 	BF2_NULL = 0x00,
 
-	/**Combined value of BF2_USPSINTELLIGENTMAIL, BF2_POSTNET, BF2_PLANET, BF2_AUSTRALIANPOST, BF2_RM4SCC.
-	When you set this barcode format, the library will automatically add LM_STATISTICS_POSTAL_CODE to LocalizationModes if you doesn't set it.*/
+	/**Combined value of BF2_USPSINTELLIGENTMAIL, BF2_POSTNET, BF2_PLANET, BF2_AUSTRALIANPOST, BF2_RM4SCC.*/
 	BF2_POSTALCODE = 0x01F00000,
 
 	/**Nonstandard barcode */
 	BF2_NONSTANDARD_BARCODE = 0x01,
 
-	/**USPS Intelligent Mail.
-	When you set this barcode format, the library will automatically add LM_STATISTICS_POSTAL_CODE to LocalizationModes if you doesn't set it.*/
+	/**USPS Intelligent Mail.*/
 	BF2_USPSINTELLIGENTMAIL = 0x00100000,
 
-	/**Postnet.
-	When you set this barcode format, the library will automatically add LM_STATISTICS_POSTAL_CODE to LocalizationModes if you doesn't set it.*/
+	/**Postnet.*/
 	BF2_POSTNET = 0x00200000,
 
-	/**Planet.
-	When you set this barcode format, the library will automatically add LM_STATISTICS_POSTAL_CODE to LocalizationModes if you doesn't set it.*/
+	/**Planet.*/
 	BF2_PLANET = 0x00400000,
 
-	/**Australian Post.
-	When you set this barcode format, the library will automatically add LM_STATISTICS_POSTAL_CODE to LocalizationModes if you doesn't set it.*/
+	/**Australian Post.*/
 	BF2_AUSTRALIANPOST = 0x00800000,
 
-	/**Royal Mail 4-State Customer Barcode.
-	When you set this barcode format, the library will automatically add LM_STATISTICS_POSTAL_CODE to LocalizationModes if you doesn't set it.*/
+	/**Royal Mail 4-State Customer Barcode.*/
 	BF2_RM4SCC = 0x01000000,
 
-	/**DotCode. When you set this barcode format, the library will automatically add LM_STATISTICS_MARKS to LocalizationModes if you doesn't set it.*/
-	BF2_DOTCODE = 0x02
+	/**DotCode.*/
+	BF2_DOTCODE = 0x02,
+
+	/**_PHARMACODE_ONE_TRACK.*/
+	BF2_PHARMACODE_ONE_TRACK = 0x04,
+
+	/**PHARMACODE_TWO_TRACK.*/
+	BF2_PHARMACODE_TWO_TRACK = 0x08,
+
+	/**PHARMACODE.*/
+	BF2_PHARMACODE = 0x0C
 }BarcodeFormat_2;
+
+
 
 #pragma pack(push)
 #pragma pack(1)
 
 typedef struct tagDMPoint
 {
-	/**The X coordinate of the point.*/
-	int x;
-
-	/**The Y coordinate of the point.*/
-	int y;
+	int coordinate[2];
 }DM_Point;
 
 typedef struct tagQuadrilateral
@@ -688,7 +562,7 @@ typedef struct tagQuadrilateral
 	/**The four points of the quadrilateral.*/
 	DM_Point points[4];
 
-}Quadrilateral;
+}Quadrilateral,*PQuadrilateral;
 
 /**
 * @struct ImageData
@@ -715,66 +589,20 @@ typedef struct tagImageData
 
 	/**The image pixel format used in the image byte array.*/
 	ImagePixelFormat format;
+
+	/**The image orientation.*/
+	int orientation;
 }ImageData;
 
-
-/**
-* Stores Dynamsoft License Server connection parameters.
-*
-*/
-typedef struct tagDM_DLSConnectionParameters
-{
-	/**The URL of the license server.*/
-	char* mainServerURL;
-
-	/**The URL of the standby license server.*/
-	char* standbyServerURL;
-
-	/**The handshake code.*/
-	char* handshakeCode;
-
-	/**The session password of the handshake code set in license server.*/
-	char* sessionPassword;
-
-	/**Sets the deployment type.*/
-	DM_DeploymentType deploymentType;
-
-	/**Sets the charge way.*/
-	DM_ChargeWay chargeWay;
-
-	/**Sets the method to generate UUID.*/
-	DM_UUIDGenerationMethod UUIDGenerationMethod;
-
-	/**Sets the max days to buffer the license info.*/
-	int maxBufferDays;
-
-	/**Sets the count of license modules to use.*/
-	int limitedLicenseModulesCount;
-
-	/**Sets the license modules to use.*/
-	DM_LicenseModule* limitedLicenseModules;
-
-	/**Sets the max concurrent instance count.*/
-	int maxConcurrentInstanceCount;
-
-	/**Sets the organization ID.*/
-	char* organizationID;
-
-	/* Sets the products. A combined value of Product Enumeration items. */
-	int products;
-
-	/**Reserved memory for struct. The length of this array indicates the size of the memory reserved for this struct.*/
-	char reserved[52];
-}DM_DLSConnectionParameters;
 
 #pragma pack(pop)
 
 #endif
 
 /**
-* @enum ImagePreprocessingMode
+* @enum GrayscaleEnhancementMode
 *
-* Describes the image preprocessing mode.
+* Describes the grayscaleEnhancementMode.
 *
 */
 typedef enum GrayscaleEnhancementMode
@@ -827,7 +655,94 @@ typedef struct tagBarcodeResultArray
 	int resultsCount;
 	BarcodeResult** results;
 }BarcodeResultArray;
-
 #pragma pack(pop)
 
+#if !defined(_WIN32) && !defined(_WIN64)
+#define DM_API __attribute__((visibility("default")))
+#include <stddef.h>
+#else
+#ifdef DM_EXPORTS
+#define DM_API __declspec(dllexport)
+#else
+#define DM_API 
+#endif
+#include <windows.h>
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+	DM_API  const char* DC_GetErrorString(int errorCode);
+	DM_API  int DC_InitLicense(const char* pLicense, char errorMsgBuffer[], const int errorMsgBufferLen);
+	DM_API  int DC_IsPointInQuadrilateral(const DM_Point* point, const Quadrilateral* quad);
+	DM_API  int DC_GetQuadrilateralArea(const Quadrilateral* quad);
+	DM_API  int DC_GetIdleInstanceCount();
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+namespace dynamsoft
+{
+	namespace core
+	{
+		class DM_API CLicenseManager
+		{
+		public:
+			static int InitLicense(const char* pLicense,char errorMsgBuffer[] = NULL,const int errorMsgBufferLen = 0);
+			static int GetIdleInstanceCount();
+		};
+
+#pragma pack(push)
+#pragma pack(1)
+
+		class DM_API CPoint
+		{
+		public:
+			int coordinate[2];
+		};
+
+		class DM_API CQuadrilateral
+		{
+		public:
+			CPoint points[4];
+
+			bool IsPointInQuadrilateral(const CPoint* point) const;
+			int GetArea() const;
+		};
+
+		class DM_API CImageData
+		{
+		protected:
+			int bytesLength;
+			unsigned char* bytes;
+			int width;
+			int height;
+			int stride;
+			ImagePixelFormat format;
+			int orientation;
+		public:
+			CImageData();
+			CImageData(int _l, unsigned char* _b, int _w, int _h, int _s, ImagePixelFormat _f, int _o = 0);
+			~CImageData();
+
+			const unsigned char* const GetBytes() const;
+			int GetBytesLength() const;
+			int GetWidth() const;
+			int GetHeight() const;
+			int GetStride() const;
+			ImagePixelFormat GetImagePixelFormat() const;
+			int GetOrientation() const;
+
+		private:
+			CImageData(const CImageData&) = delete;
+			CImageData& operator=(const CImageData&) = delete;
+		};
+
+#pragma pack(pop)
+	}
+}
+
+#endif
 #endif
