@@ -1,896 +1,429 @@
 #pragma once
 
 #if !defined(_WIN32) && !defined(_WIN64)
+
+#ifdef __EMSCRIPTEN__
+#define DLR_API __attribute__((used))
+#else
 #define DLR_API __attribute__((visibility("default")))
+#endif
+
 #include <stddef.h>
 #else
 #ifdef DLR_EXPORTS
 #define DLR_API __declspec(dllexport)
 #else
-#define DLR_API 
+#define DLR_API __declspec(dllimport)
 #endif
 #include <windows.h>
 #endif
 
 #include "DynamsoftCore.h"
 
+#define DLR_VERSION                  "3.0.0.629"
 
-#define DLR_VERSION                  "2.2.20.0929"
-
-/**Recognition timeout*/
-#define DLRERR_RECOGNITION_TIMEOUT		-10026
-
-/**Character Model file is not found*/
-#define DLRERR_CHARACTER_MODEL_FILE_NOT_FOUND -10100
-
-
-/**
-* @enum LocalizationSourceType
-*
-* Describes localization source type.
-*
-*/
-typedef enum LocalizationSourceType
-{
-	/**Define the reference region using the manually specified location.*/
-	LST_MANUAL_SPECIFICATION = 0x01,
-	
-	/**Define the reference region using the result(s) of region predetection process.*/
-	LST_PREDETECTED_REGION = 0x02,
-
-	/**Define the reference region using the barcode info.*/
-	LST_BARCODE = 0x04
-}LocalizationSourceType;
-
-
+/**Structures section*/
 
 #pragma pack(push)
 #pragma pack(1)
 
-
 /**
-* @struct DLR_DictionaryCorrectionThreshold
-*
-* Stores the dictionary correction threshold.
+* The SimplifiedLabelRecognizerSettings struct contains settings for label recognition. It is a sub-parameter of SimplifiedCaptureVisionSettings.
 */
-typedef struct tagDLRDictionaryCorrectionThreshold
+typedef struct tagSimplifiedLabelRecognizerSettings 
 {
-	int minWordLength;
-	int maxWordLength;
-	int threshold;
-}DLR_DictionaryCorrectionThreshold;
-
-/**
-* @struct DLR_Region
-*
-* Stores the region info.
-*
-*/
-typedef struct tagDLRReferenceRegion
-{
-	/**The source type used to localize the reference region(s).
-	*
-	* @par Value range:
-	* 	    A value of the LocalizationSourceType Enumeration items.
-	* @par Default value:
-	* 	    LST_MANUAL_SPECIFICATION
-	* @sa DLRLocalizationSourceType
-	*
-	*/
-	LocalizationSourceType localizationSourceType;
-
-	/**Four vertexes in a clockwise direction of a quadrilateral. Index 0 represents the left-most vertex.
-	*
-	* @par Remarks:
-	*     It works only when localizationSourceType is settings to DLR_LST_MANUAL_SPECIFICATION.
-	*     The library will localize reference region(s) based on the quadrilateral set by current setting.
-	*
-	*/
-	Quadrilateral location;
-
-	/**Whether or not to use percentage to measure the coordinate.
-	*
-	* @par Value range:
-	* 	    [0, 1]
-	* @par Default value:
-	* 	    1
-	* @par Remarks:
-	*     It works only when localizationSourceType is settings to DLR_LST_MANUAL_SPECIFICATION.
-	*     0: not by percentage
-	*     1: by percentage
-	*     When it's set to 1, the values of points indicate percentage (from 0 to 100); Otherwise, they indicate coordinates in pixel.
-	*
-	*/
-	int regionMeasuredByPercentage;
-
-	/**The index of a specific region predetection mode in the regionPredetectionModes parameter.
-	*
-	* @par Value range:
-	* 	    [-1, 0x7fffffff]
-	* @par Default value:
-	* 	    -1
-	* @par Remarks:
-	*     It works only when localizationSourceType is settings to DLR_LST_PREDETECTED_REGION.
-	*     The library will localize reference region(s) based on the detected regions from the specified region predetection mode.
-	*
-	*/
-	int regionPredetectionModesIndex;
-
-	/**The formats of the barcode in BarcodeFormat group 1.
-	*
-	* @par Value range:
-	* 	    A combined value of BarcodeFormat Enumeration items.
-	* @par Default value:
-	* 	    DLR_BF_ALL
-	* @par Remarks:
-	*     Barcode formats in BarcodeFormat group 1 can be combined.
-	*     It works only when localizationSourceType is settings to LST_BARCODE.
-	*     The library will localize reference region(s) based on the barcodes whose format meets current setting.
-	*
-	*/
-	int barcodeFormatIds;
-
-	/**The formats of the barcode in BarcodeFormat group 2.
-	*
-	* @par Value range:
-	* 	    A combined value of BarcodeFormat_2 Enumeration items.
-	* @par Default value:
-	* 	    DLR_BF2_NULL
-	* @par Remarks:
-	*     Barcode formats in BarcodeFormat group 2 can be combined.
-	*     It works only when localizationSourceType is settings to LST_BARCODE.
-	*     The library will localize reference region(s) based on the barcodes whose format meets current setting.
-	*
-	*/
-	int barcodeFormatIds_2;
-
-	/**The regular express pattern of barcode text.
-	*
-	* @par Remarks:
-	*     It works only when localizationSourceType is settings to DLR_LST_BARCODE.
-	*     The library will localize reference region(s) based on the barcodes whose format meets current setting.
-	*
-	*/
-	char barcodeTextRegExPattern[64];
-
-	/**Resered memory for struct. The length of this array indicates the size of the memory reserved for this struct.*/
-	char reserved[64];
-}DLR_ReferenceRegion;
-
-/**
-* Stores the FurtherModes.
-*
-*/
-typedef struct tagDLRFurtherModes
-{
-	/**Sets the mode and priority for converting a colour image to a grayscale image.
-	*
-	* @par Value range:
-	* 	    Each array item can be any one of the ColourConversionMode Enumeration items.
-	* @par Default value:
-	* 	    [CICM_GENERAL,CICM_SKIP,CICM_SKIP,CICM_SKIP,CICM_SKIP,CICM_SKIP,CICM_SKIP,CICM_SKIP]
-	* @par Remarks:
-	*     The array index represents the priority of the item. The smaller index is, the higher priority is.
-	* @sa ColourConversionMode
-	*/
-	ColourConversionMode colourConversionModes[8];
-
-	/**Sets the mode and priority for the grayscale image conversion.
-	*
-	* @par Value range:
-	* 	    Each array item can be any one of the DLRGrayscaleTransformationMode Enumeration items.
-	* @par Default value:
-	* 	    [GTM_ORIGINAL,GTM_SKIP,GTM_SKIP,GTM_SKIP,GTM_SKIP,GTM_SKIP,GTM_SKIP,GTM_SKIP]
-	* @par Remarks:
-	*     The array index represents the priority of the item. The smaller index is, the higher priority is.
-	* @sa GrayscaleTransformationMode
-	*/
+	/**Set the grayscale transformation modes with an array of enumeration GrayscaleTransformationMode.*/
 	GrayscaleTransformationMode grayscaleTransformationModes[8];
 
-	/**Sets the region pre-detection mode for barcodes search.
-	*
-	* @par Value range:
-	* 	    Each array item can be any one of the RegionPredetectionMode Enumeration items
-	* @par Default value:
-	* 	    [RPM_GENERAL,RPM_SKIP,RPM_SKIP,RPM_SKIP,RPM_SKIP,RPM_SKIP,RPM_SKIP,RPM_SKIP]
-	* @par Remarks:
-	*     The array index represents the priority of the item. The smaller index is, the higher priority is.
-	*     If the image is large and the barcode on the image is very small, it is recommended to enable region predetection to speed up the localization process and recognition accuracy.
-	* @sa RegionPredetectionMode
-	*/
-	RegionPredetectionMode regionPredetectionModes[8];
-
-	/**Sets the mode and priority for image preprocessing algorithms.
-	*
-	* @par Value range:
-	* 	    Each array item can be any one of the GrayscaleEnhancementMode Enumeration items.
-	* @par Default value:
-	* 	    [GEM_GENERAL,GEM_SKIP,GEM_SKIP,GEM_SKIP,GEM_SKIP,GEM_SKIP,GEM_SKIP,GEM_SKIP]
-	* @par Remarks:
-	*     The array index represents the priority of the item. The smaller index is, the higher priority is.
-	* @sa GrayscaleEnhancementMode
-	*/
+	/**Set the grayscale enhancement modes with an array of enumeration GrayscaleEnhancementMode.*/
 	GrayscaleEnhancementMode grayscaleEnhancementModes[8];
 
-	/**Sets the mode and priority for texture detection.
-	*
-	* @par Value range:
-	* 	    Each array item can be any one of the TextureDetectionMode Enumeration items
-	* @par Default value:
-	* 	    [TDM_GENERAL_WIDTH_CONCENTRATION,TDM_SKIP,TDM_SKIP,TDM_SKIP,TDM_SKIP,TDM_SKIP,TDM_SKIP,TDM_SKIP]
-	* @par Remarks:
-	*     The array index represents the priority of the item. The smaller index is, the higher priority is.
-	* @sa TextureDetectionMode
-	*/
-	TextureDetectionMode textureDetectionModes[8];
-
-	/**Reserved memory for struct. The length of this array indicates the size of the memory reserved for this struct.
-	*
-	*/
-	char reserved[128];
-}DLR_FurtherModes;
-
-/**
-* @struct DLR_RuntimeSettings
-*
-* Defines a struct to configure the runtime settings. These settings control the recognition process.
-*
-*/
-typedef struct tagDLRRuntimeSettings
-{
-	/**Sets the number of the threads the algorithm will use to recognize label.
-	*
-	* @par Value range:
-	* 	  [1, 4]
-	* @par Default value:
-	* 	  4
-	* @par Remarks:
-	*     To keep a balance between speed and quality, the library concurrently runs four different threads by default.
-	*
-	*/
-	int maxThreadCount;
-
-	/**Sets the name of the CharacterModel.
-	*
-	* @par Value range:
-	*     ["Letter", "NumberLetter", "NumberUppercase", "Number"] or other customized character model name.
-	*
-	*/
+	/**Specify a character model by its name.*/
 	char characterModelName[64];
 
+	/**Set the RegEx pattern of the text line string to filter out the unqualified results.*/
+	char lineStringRegExPattern[1024];
 
-	/**Sets the reference region to search for text.*/
-	DLR_ReferenceRegion referenceRegion;
+	/**Set the maximum available threads count in one label recognition task.*/
+	int maxThreadsInOneTask;
 
-	/**Sets the text area relative to the reference region.*/
-	Quadrilateral textArea;
+	/**Reserved for future use.*/
+	char reserved[512];
 
-	/**Sets the dictionnary path.*/
-	char dictionaryPath[256];
-
-	/**Sets the dictionary correction threshold.*/
-	DLR_DictionaryCorrectionThreshold dictionaryCorrectionThreshold;
-
-	/**Sets the mode and priority for binarization.
-	*
-	* @par Value range:
-	* 	    Each array item can be any one of the BinarizationMode Enumeration items.
-	* @par Default value:
-	* 	    [BM_LOCAL_BLOCK,BM_SKIP,BM_SKIP,BM_SKIP,BM_SKIP,BM_SKIP,BM_SKIP,BM_SKIP]
-	* @par Remarks:
-	*     The array index represents the priority of the item. The smaller index is, the higher priority is.
-	* @sa BinarizationMode
-	*/
-	BinarizationMode binarizationModes[8];
-
-	/**Sets further modes.*/
-	DLR_FurtherModes furtherModes;
-	/**Sets the maximum amount of time (in milliseconds) .
-	*
-	* @par Value range:
-	* 	    [0, 0x7fffffff]
-	* @par Default value:
-	* 	    10000
-	* @par Remarks:
-	*	    If you want to stop reading after a certain period of time, you can use this parameter to set a timeout.
-	*/
-	int timeout;
-
-	/**Reserved memory for the struct.*/
-	char reserved[60];
-}DLR_RuntimeSettings;
-
-/**
-* @struct DLR_CharacterResult
-*
-* Stores character result.
-*
-*/
-typedef struct tagDLRCharacterResult
-{
-	/**The recognized character with highest confidence.*/
-	char characterH;
-
-	/**The recognized character with middle confidence.*/
-	char characterM;
-
-	/**The recognized character with lowest confidence.*/
-	char characterL;
-
-	/**The location of current character.*/
-	Quadrilateral location;
-
-	/**The confidence of the recognized character with highest confidence.*/
-	int characterHConfidence;
-
-	/**The confidence of the recognized character with middle confidence.*/
-	int characterMConfidence;
-
-	/**The confidence of the recognized character with lowest confidence.*/
-	int characterLConfidence;
-
-	/**Reserved memory for the struct.*/
-	char reserved[32];
-}DLR_CharacterResult, *PDLR_CharacterResult;
-
-/**
-* @struct DLRLineResult
-*
-* Stores line result.
-*
-*/
-typedef struct tagLineResult
-{
-	/**The name of the line specification used to recognize current line result.*/
-	const char* lineSpecificationName;
-
-	/**The recognized text, ends by '\0'.*/
-	const char* text;
-
-	/**The character model used to recognize the text.*/
-	const char* characterModelName;
-
-	/**The localization of current line.*/
-	Quadrilateral location;
-
-	/**The confidence of the result.*/
-	int confidence;
-
-	/**The character result count.*/
-	int characterResultsCount;
-
-	/**The character results array.*/
-	PDLR_CharacterResult* characterResults;
-
-	/**Reserved memory for the struct.*/
-	char reserved[64];
-}DLR_LineResult, *PDLR_LineResult;
-
-/**
-* @struct DLR_Result
-*
-* Stores result.
-*
-*/
-typedef struct tagDLRResult
-{
-	/**The name of the reference region used to recognize current result.*/
-	const char* referenceRegionName;
-
-	/**The name of the text area used to recognize current result.*/
-	const char* textAreaName;
-
-	/**The localization result.*/
-	Quadrilateral location;
-
-	/**The confidence of the result.*/
-	int confidence;
-
-	/**The line result count.*/
-	int lineResultsCount;
-
-	/**The line results array.*/
-	PDLR_LineResult* lineResults;
-
-	/**Page number.*/
-	int pageNumber;
-
-	/**Reserved memory for the struct.*/
-	char reserved[60];
-}DLR_Result, *PDLR_Result;
-
-/**
-* @struct DLR_ResultArray
-*
-* Stores result array.
-*
-*/
-typedef struct tagDLRResultArray
-{
-	/**The recognized results array.*/
-	PDLR_Result* results;
-
-	/**The total count of recognized results.*/
-	int resultsCount;
-}DLR_ResultArray;
-
+}SimplifiedLabelRecognizerSettings;
 
 #pragma pack(pop)
 
 #ifdef __cplusplus
-extern "C" {
-#endif
 
-	/**
-	* Returns the error info string.
-	*
-	* @param [in] errorCode The error code.
-	*
-	* @return The error message.
-	*
-	*/
-	DLR_API const char* DLR_GetErrorString(const int errorCode);
-
-	/**
-	* Returns the version info of the SDK.
-	*
-	* @return The version info string.
-	*
-	*/
-	DLR_API const char* DLR_GetVersion();
-
-	/**
-	* Creates a Dynamsoft DLR instance.
-	*
-	* @return An DLR instance. If failed, return NULL.
-	*
-	*/
-	DLR_API void* DLR_CreateInstance();
-
-	/**
-	* Destorys an instance of Dynamsoft DLR instance.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	*
-	*/
-	DLR_API void DLR_DestroyInstance(void* recognizer);
-
-	/**
-	* Gets current settings and save it into a struct.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in, out] pSettings The struct of runtime settings.
-	* 
-	* @return Returns error code. Returns 0 if the function operates successfully. You can call
-	* 		   DLR_GetErrorString() to get detailed error message.
-	*/
-	DLR_API int DLR_GetRuntimeSettings(void* recognizer, DLR_RuntimeSettings* pSettings);
-
-	/**
-	* Updates runtime settings with a given struct.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] pSettings The struct of runtime settings.
-	* @param [in, out] errorMsgBuffer The buffer is allocated by caller and the recommended length is 256. The error message will be copied to the buffer.
-	* @param [in] errorMsgBufferLen The length of the allocated buffer.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can check errorMsgBuffer to get detailed error message.
-	*/
-	DLR_API int DLR_UpdateRuntimeSettings(void* recognizer, DLR_RuntimeSettings* pSettings, char errorMsgBuffer[], const int errorMsgBufferLen);
-
-
-	/**
-	* Initializes runtime settings with the settings in a given JSON string.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] content A JSON string that represents the content of the settings.
-	* @param [in,out] errorMsgBuffer (Optional) The buffer is allocated by caller and the recommended length
-	* 				  is 256. The error message will be copied to the buffer.
-	* @param [in] errorMsgBufferLen (Optional) The length of the allocated buffer.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can call
-	* 		   GetErrorString() to get detailed error message.
-	*
-	*/
-	DLR_API	int DLR_InitRuntimeSettings(void* recognizer, const char* content, char errorMsgBuffer[], int errorMsgBufferLen);
-
-
-	/**
-	* Initializes runtime settings with the settings in a given JSON file.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] filePath The settings file path.
-	* @param [in,out] errorMsgBuffer (Optional) The buffer is allocated by caller and the recommended length
-	* 				  is 256. The error message will be copied to the buffer.
-	* @param [in] errorMsgBufferLen (Optional) The length of the allocated buffer.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can call
-	* 		   GetErrorString() to get detailed error message.
-	*
-	*/
-	DLR_API int DLR_InitRuntimeSettingsFromFile(void* recognizer, const char* filePath, char errorMsgBuffer[], int errorMsgBufferLen);
-	/**
-	* Reset runtime settings.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	*
-	*/
-	DLR_API int DLR_ResetRuntimeSettings(void* recognizer);
-
-	/**
-	* Sets the optional argument for a specified mode in Modes parameters.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] pModesName The mode parameter name to set argument.
-	* @param [in] index The array index of mode parameter to indicate a specific mode.
-	* @param [in] pArgumentName The name of the argument to set.
-	* @param [in] pArgumentValue The value of the argument to set.
-	* @param [in,out] errorMsgBuffer The buffer is allocated by the caller and the recommended length is 256. The error message will be copied to the buffer.
-	* @param [in] errorMsgBufferLen The length of the allocated buffer.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can check errorMsgBuffer to get detailed error message.
-	*
-	*/
-	DLR_API int DLR_SetModeArgument(void *recognizer, const char *pModesName, const int index, const char *pArgumentName, const char *pArgumentValue, char errorMsgBuffer[], const int errorMsgBufferLen);
-
-	/**
-	* Gets the optional argument for a specified mode in Modes parameters.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] pModesName The mode parameter name to get argument.
-	* @param [in] index The array index of mode parameter to indicate a specific mode.
-	* @param [in] pArgumentName The name of the argument to get.
-	* @param [in,out] valueBuffer The buffer is allocated by caller and the recommended length is 480. The argument value would be copied to the buffer.
-	* @param [in] valueBufferLen The length of allocated buffer.
-	* @param [in,out] errorMsgBuffer The buffer is allocated by the caller and the recommended length is 256. The error message will be copied to the buffer.
-	* @param [in] errorMsgBufferLen The length of the allocated buffer.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can check errorMsgBuffer to get detailed error message.
-	*
-	*/
-	DLR_API int DLR_GetModeArgument(void *recognizer, const char *pModesName, const int index, const char *pArgumentName, char valueBuffer[], const int valueBufferLen, char errorMsgBuffer[], const int errorMsgBufferLen);
-
-	/**
-	*
-	* Get all template settings' names;
-	*
-	*/
-	DLR_API int DLR_GetAllTemplateSettingsNames(void* recognizer, char(*names)[64], int arrLen);
-
-	/**
-	* Output DLRParameter settings into a file(JSON file).
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] templateName The name of the template which is to be output.
-	* @param [in] outputFilePath The output file path which stores settings.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can call
-	* 		   DLR_GetErrorString() to get detailed error message.
-	*/
-	DLR_API int DLR_OutputRuntimeSettingsToFile(void* recognizer, const char* templateName,const char* outputFilePath);
-
-	/**
-	* Output DLRParameter settings into a string(JSON file).
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] templateName The name of the template which is to be output.
-	* @param [in,out] content The output string which stores the contents of current settings.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can call
-	* 		   DLR_GetErrorString() to get detailed error message.
-	*/
-	DLR_API int DLR_OutputRuntimeSettings(void* recognizer, const char* templateName,char **content);
-
-
-	DLR_API void DLR_FreeString(char **content);
-	/**
-	* Recognizes text from memory buffer containing image pixels in defined format.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] pImageDate A struct of DLRImageData that represents an image.
-	* @param [in] templateName The template name.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can call
-	* 		   DLR_GetErrorString() to get detailed error message.
-	*
-	*/
-	DLR_API int DLR_RecognizeBuffer(void* recognizer, const ImageData* pImageData, const char* templateName);
-
-	/**
-	* Recognizes text from a specified image file.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] fileName A string defining the file name.
-	* @param [in] templateName The template name.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can call
-	* 		   DLR_GetErrorString() to get detailed error message.
-	*
-	*/
-	DLR_API int DLR_RecognizeFile(void* recognizer, const char* fileName, const char* templateName);
-
-	/**
-	* Recognizes text from a specified image file in memory.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] pFileBytes The image file bytes in memory.
-	* @param [in] fileSize The length of the file bytes in memory.
-	* @param [in] templateName The template name.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can call
-	* 		   DLR_GetErrorString() to get detailed error message.
-	*
-	*/
-	DLR_API int DLR_RecognizeFileInMemory(void* recognizer, const unsigned char* pFileBytes, int fileSize, const char* templateName);
-
-	/**
-	* Get all recognized results.
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param[in, out] pResults The results are allocated by our SDK and should be freed by calling the function DLR_FreeDLRResults.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can call
-	* 		   DLR_GetErrorString() to get detailed error message.
-	*
-	*/
-	DLR_API int DLR_GetAllResults(void* recognizer, DLR_ResultArray** pResults);
-
-	/**
-	* Free memory allocated for recognized results.
-	*
-	* @param[in] pResults Recognized results.
-	*
-	*/
-	DLR_API void DLR_FreeResults(DLR_ResultArray** pResults);
-
-	/**
-	* Updates reference region which is defined with source type DLR_LST_BARCODE
-	*
-	* @param [in] recognizer Handle of Dynamsoft DLR instance.
-	* @param [in] barcodeResults The barcode results used to localize reference region.
-	* @param [in] templateName The template name. A template name is the value of key LabelRecognitionParameter.Name defined in JSON formatted settings.
-	*                          If no template name is specified, current runtime settings will be used.
-	*
-	* @return Returns error code. Returns 0 if the function operates successfully. You can call
-	* 		  DLR_GetErrorString() to get detailed error message.
-	*/
-	DLR_API int DLR_UpdateReferenceRegionFromBarcodeResults(void* recognizer, BarcodeResultArray* barcodeResults, const char * templateName);
-
-
-	DLR_API int DLR_SetCharacterModelDefaultPath(void* recognizer, const char* modelPath, char errorMsgBuffer[], const int errorMsgBufferLen);
-#ifdef __cplusplus
-}
-#endif
-
-#ifdef __cplusplus
-
-class LabelRecognizerInner;
+using namespace dynamsoft::basic_structures;
+using namespace dynamsoft::intermediate_results;
 
 namespace dynamsoft
 {
 	namespace dlr
 	{
 
-		class DLR_API CLabelRecognizer
+		/**
+		* The `CCharacterResult` class represents the result of a character recognition process. It contains the characters recognized (high, medium, and low confidence), their respective confidences, and the location of the character in a quadrilateral shape.
+		*
+		*/
+		class DLR_API CCharacterResult
 		{
-		protected:
-			LabelRecognizerInner * m_DLRInner;
-
 		public:
-			CLabelRecognizer();
-
-			~CLabelRecognizer();
-
 			/**
-			* Returns the error info string.
-			*
-			* @param [in] errorCode The error code.
-			*
-			* @return The error message.
-			*
-			*/
-			static const char* GetErrorString(const int errorCode);
-
+			 * The character with high confidence.
+			 */
+			char characterH;
 			/**
-			* Returns the version info of the SDK.
-			*
-			* @return The version info string.
-			*
-			*/
-			static const char* GetVersion();
-
+			 * The character with medium confidence.
+			 */
+			char characterM;
 			/**
-			* Gets current settings and save it into a struct.
-			*
-			* @param [in, out] pSettings The struct of runtime settings.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		   DLR_GetErrorString() to get detailed error message.
-			*/
-			int GetRuntimeSettings(DLR_RuntimeSettings* pSettings);
-
+			 * The character with low confidence.
+			 */
+			char characterL;
 			/**
-			* Updates runtime settings with a given struct.
-			*
-			* @param [in] pSettings The struct of runtime settings.
-			* @param [in, out] errorMsgBuffer The buffer is allocated by caller and the recommended length is 256. The error message will be copied to the buffer.
-			* @param [in] errorMsgBufferLen The length of the allocated buffer.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can check errorMsgBuffer to get detailed error message.
-			*
-			*/
-			int UpdateRuntimeSettings(DLR_RuntimeSettings* pSettings, char errorMsgBuffer[] = NULL, const int errorMsgBufferLen = 0);
-
+			 * The location of the character in a quadrilateral shape.
+			 */
+			CQuadrilateral location;
 			/**
-			* Initializes runtime settings with the settings in a given JSON string.
-			*
-			* @param [in] content A JSON string that represents the content of the settings.
-			* @param [in,out] errorMsgBuffer (Optional) The buffer is allocated by caller and the recommended length
-			* 				  is 256. The error message will be copied to the buffer.
-			* @param [in] errorMsgBufferLen (Optional) The length of the allocated buffer.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		   GetErrorString() to get detailed error message.
-			*
-			*/
-			int InitRuntimeSettings(const char* content, char errorMsgBuffer[] = NULL, int errorMsgBufferLen = 0);
-
+			 * The confidence of the character with high confidence.
+			 */
+			int characterHConfidence;
 			/**
-			* Initializes runtime settings with the settings in a given JSON file.
-			*
-			* @param [in] filePath The settings file path.
-			* @param [in,out] errorMsgBuffer (Optional) The buffer is allocated by caller and the recommended length
-			* 				  is 256. The error message will be copied to the buffer.
-			* @param [in] errorMsgBufferLen (Optional) The length of the allocated buffer.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		   GetErrorString() to get detailed error message.
-			*
-			*/
-			int InitRuntimeSettingsFromFile(const char* filePath, char errorMsgBuffer[] = NULL, int errorMsgBufferLen = 0);
+			 * The confidence of the character with medium confidence.
+			 */
+			int characterMConfidence;
 			/**
-			* Reset runtime settings.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		   DLR_GetErrorString() to get detailed error message.
-			*
-			*/
-			int ResetRuntimeSettings();
-
-			/**
-			* Sets the optional argument for a specified mode in Modes parameters.
-			*
-			* @param [in] pModesName The mode parameter name to set argument.
-			* @param [in] index The array index of mode parameter to indicate a specific mode.
-			* @param [in] pArgumentName The name of the argument to set.
-			* @param [in] pArgumentValue The value of the argument to set.
-			* @param [in,out] errorMsgBuffer The buffer is allocated by the caller and the recommended length is 256. The error message will be copied to the buffer.
-			* @param [in] errorMsgBufferLen The length of the allocated buffer.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can check errorMsgBuffer to get detailed error message.
-			*
-			*/
-			int SetModeArgument(const char *pModesName, const int index, const char *pArgumentName, const char *pArgumentValue, char errorMsgBuffer[] = NULL, const int errorMsgBufferLen = 0);
-
-			/**
-			* Gets the optional argument for a specified mode in Modes parameters.
-			*
-			* @param [in] pModesName The mode parameter name to get argument.
-			* @param [in] index The array index of mode parameter to indicate a specific mode.
-			* @param [in] pArgumentName The name of the argument to get.
-			* @param [in,out] valueBuffer The buffer is allocated by caller and the recommended length is 480. The argument value would be copied to the buffer.
-			* @param [in] valueBufferLen The length of allocated buffer.
-			* @param [in,out] errorMsgBuffer The buffer is allocated by the caller and the recommended length is 256. The error message will be copied to the buffer.
-			* @param [in] errorMsgBufferLen The length of the allocated buffer.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can check errorMsgBuffer to get detailed error message.
-			*
-			*/
-			int GetModeArgument(const char *pModesName, const int index, const char *pArgumentName, char valueBuffer[], const int valueBufferLen, char errorMsgBuffer[] = NULL, const int errorMsgBufferLen = 0);
-
-
-			int GetAllTemplateSettingsNames(char(*names)[64], int arrLen);
-
-			/**
-			* Output DLRParameter settings into a file(JSON file).
-			*
-			* @param [in] templateName The name of the template which is to be output.
-			* @param [in] outputFilePath The output file path which stores settings.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		   DLR_GetErrorString() to get detailed error message.
-			*
-			*/
-			int OutputRuntimeSettingsToFile(const char* templateName,const char* outputFilePath);
-
-			/**
-			* Output DLRParameter settings into string(JSON file).
-			*
-			* @param [in] templateName The name of the template which is to be output.
-			* @param [in,out] content The output string which stores the contents of current settings.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		   DLR_GetErrorString() to get detailed error message.
-			*/
-			int OutputRuntimeSettings(const char* templateName,char **content);
-
-			/**
-			* Recognizes text from memory buffer containing image pixels in defined format.
-			*
-			* @param [in] pImageDate A struct of DLRImageData that represents an image.
-			* @param [in] templateName The template name.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		   DLR_GetErrorString() to get detailed error message.
-			*
-			*/
-			int RecognizeBuffer(const core::CImageData* pImageData, const char* templateName);
-
-			/**
-			* Recognizes text from a specified image file.
-			*
-			* @param [in] fileName A string defining the file name.
-			* @param [in] templateName The template name.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		   DLR_GetErrorString() to get detailed error message.
-			*
-			*/
-			int RecognizeFile(const char* fileName, const char* templateName);
-
-			/**
-			* Recognizes text from a specified image file in memory.
-			*
-			* @param [in] pFileBytes The image file bytes in memory.
-			* @param [in] fileSize The length of the file bytes in memory.
-			* @param [in] templateName The template name.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		   DLR_GetErrorString() to get detailed error message.
-			*
-			*/
-			int RecognizeFileInMemory(const unsigned char* pFileBytes, int fileSize, const char* templateName);
-
-			/**
-			* Get all recognized results.
-			*
-			* @param[in, out] pResults The results are allocated by our SDK and should be freed by calling the function DLR_FreeDLRResults.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		   DLR_GetErrorString() to get detailed error message.
-			*
-			*/
-			int GetAllResults(DLR_ResultArray** pResults);
-
-			/**
-			* Free memory allocated for recognized results.
-			*
-			* @param[in] pResults Recognized results.
-			*
-			*/
-			static void FreeResults(DLR_ResultArray** pResults);
-
-
-			static void FreeString(char** content);
-
-			/**
-			* Updates reference region which is defined with source type DLR_LST_BARCODE
-			*
-			* @param [in] barcodeResults The barcode results used to localize reference region.
-			* @param [in] templateName The template name. A template name is the value of key LabelRecognizerParameter.Name defined in JSON formatted settings.
-			*                          If no template name is specified, current runtime settings will be used.
-			*
-			* @return Returns error code. Returns 0 if the function operates successfully. You can call
-			* 		  GetErrorString() to get detailed error message.
-			*/
-			int UpdateReferenceRegionFromBarcodeResults(const BarcodeResultArray* barcodeResults, const char * templateName);
-
-
-			int SetCharacterModelDefaultPath(const char* modelPath, char errorMsgBuffer[] = NULL, const int errorMsgBufferLen = 0);
-		private:
-			CLabelRecognizer(const CLabelRecognizer& r);
-			CLabelRecognizer& operator=(const CLabelRecognizer& r);
+			 * The confidence of the character with low confidence.
+			 */
+			int characterLConfidence;
 		};
+
+		namespace intermediate_results
+		{
+			/**
+			* The `CLocalizedTextLineElement` class represents a localized text line element. It inherits from the `CRegionObjectElement` class.
+			*
+			*/
+			class DLR_API CLocalizedTextLineElement : public CRegionObjectElement
+			{
+			public:
+				/**
+				 * Destructor
+				 */
+				virtual ~CLocalizedTextLineElement() {};
+
+				/**
+				* Gets the number of character quads in the text line.
+				*
+				* @return Returns the number of character quads in the text line.
+				*
+				*/
+				virtual int GetCharacterQuadsCount() const = 0;
+
+				/**
+				* Gets the quadrilateral of a specific character in the text line.
+				*
+				* @param [in] index The index of the character.
+				* @param [out] quad The quadrilateral of the character.
+				*
+				* @return Returns 0 if successful, otherwise returns a negative value.
+				*
+				*/
+				virtual int GetCharacterQuad(int index, CQuadrilateral* quad) const = 0;
+
+				/**
+				* Gets the row number of the text line.
+				*
+				* @return Returns the row number of the text line.
+				*
+				*/
+				virtual int GetRowNumber() const = 0;
+			};
+
+			/**
+			* The `CRecognizedTextLineElement` class represents a line of recognized text in an image. It inherits from the `CRegionObjectElement` class.
+			*
+			*/
+			class DLR_API CRecognizedTextLineElement : public CRegionObjectElement
+			{
+			public:
+				/**
+				 * Destructor
+				 */
+				virtual ~CRecognizedTextLineElement() {};
+
+				/**
+				* Gets the recognized text.
+				*
+				* @return Returns a pointer to the recognized text.
+				*
+				*/
+				virtual const char* GetText() const = 0;
+
+				/**
+				* Gets the confidence level of the recognized text.
+				*
+				* @return Returns an integer value representing the confidence level of the recognized text.
+				*
+				*/
+				virtual int GetConfidence() const = 0;
+
+				/**
+				* Gets the number of individual character recognition results in the line.
+				*
+				* @return Returns an integer value representing the number of individual character recognition results.
+				*
+				*/
+				virtual int GetCharacterResultsCount() const = 0;
+
+				/**
+				* Gets the character recognition result at the specified index.
+				*
+				* @param [in] index The index of the character recognition result to retrieve.
+				* @param [out] charResult A pointer to a CCharacterResult object to store the result in.
+				*
+				* @return Returns an integer value representing the success of the operation. Zero indicates success, while any other value indicates failure.
+				*
+				*/
+				virtual int GetCharacterResult(int index, CCharacterResult* charResult) const = 0;
+
+				/**
+				* Gets the row number of the text line within the image.
+				*
+				* @return Returns an integer value representing the row number of the text line within the image.
+				*
+				*/
+				virtual int GetRowNumber() const = 0;
+			};
+
+			/**
+			* The `CLocalizedTextLinesUnit` class represents a unit that contains localized text lines. It inherits from the `CIntermediateResultUnit` class.
+			*
+			*/
+			class DLR_API CLocalizedTextLinesUnit : public CIntermediateResultUnit
+			{
+			public:
+				/**
+				 * Destructor
+				 */
+				virtual ~CLocalizedTextLinesUnit() {};
+
+				/**
+				* Gets the number of localized text lines in the unit.
+				*
+				* @return Returns the number of localized text lines in the unit.
+				*
+				*/
+				virtual int GetCount() const = 0;
+
+				/**
+				* Gets a pointer to a specific localized text line element.
+				*
+				* @param [in] index The index of the localized text line element to retrieve.
+				*
+				* @return Returns a const pointer to the localized text line element at the specified index.
+				*
+				*/
+				virtual const CLocalizedTextLineElement* GetLocalizedTextLine(int index) const = 0;
+			};
+
+			/**
+			* The `CRecognizedTextLinesUnit` class represents an intermediate result unit containing recognized text lines. It inherits from the `CIntermediateResultUnit` class.
+			*
+			*/
+			class DLR_API CRecognizedTextLinesUnit : public CIntermediateResultUnit
+			{
+			public:
+				/**
+				 * Destructor
+				 */
+				virtual ~CRecognizedTextLinesUnit() {};
+
+				/**
+				* Gets the number of recognized text lines in the unit.
+				*
+				* @return Returns the number of recognized text lines in the unit.
+				*
+				*/
+				virtual int GetCount() const = 0;
+
+				/**
+				* Gets a pointer to the CRecognizedTextLineElement object at the specified index.
+				*
+				* @param [in] index The index of the desired CRecognizedTextLineElement object.
+				*
+				* @return Returns a pointer to the CRecognizedTextLineElement object at the specified index.
+				*
+				*/
+				virtual const CRecognizedTextLineElement* GetRecognizedTextLine(int index) const = 0;
+			};
+		}
+
+		/**
+		* The `CTextLineResultItem` class represents a text line result item recognized by a document layout analysis engine. It is derived from `CCapturedResultItem`.
+		*
+		*/
+		class DLR_API CTextLineResultItem : public CCapturedResultItem
+		{
+		public:
+			/**
+			 * Destructor
+			 */
+			virtual ~CTextLineResultItem() {};
+
+			/**
+			* It is used to get the text content of the text line.
+			*
+			* @return Returns the text content of the text line.
+			*
+			*/
+			virtual const char* GetText() const = 0;
+
+			/**
+			* It is used to get the location of the text line in the form of a quadrilateral.
+			*
+			* @return Returns the location of the text line in the form of a quadrilateral.
+			*
+			*/
+			virtual CQuadrilateral GetLocation() const = 0;
+
+			/**
+			* It is used to get the confidence of the text line recognition result.
+			*
+			* @return Returns the confidence of the text line recognition result.
+			*
+			*/
+			virtual int GetConfidence() const = 0;
+
+			/**
+			* It is used to get the count of character results in the text line.
+			*
+			* @return Returns the count of character results in the text line.
+			*
+			*/
+			virtual int GetCharacterResultsCount() const = 0;
+
+			/**
+			* It is used to get the character result at the specified index.
+			*
+			* @param [in] index The index of the character result to get.
+			* @param [out] charResult The character result at the specified index.
+			*
+			* @return Returns 0 if successful, otherwise returns a non-zero error code.
+			*
+			*/
+			virtual int GetCharacterResult(int index, CCharacterResult* charResult) const = 0;
+
+		};
+
+		/**
+		* The `CRecognizedTextLinesResult` class represents the result of a text recognition process. It provides access to information about the recognized text lines, the source image, and any errors that occurred during the recognition process.
+		*
+		*/
+		class DLR_API CRecognizedTextLinesResult
+		{
+		public:
+			/**
+			 * Destructor
+			 */
+			virtual ~CRecognizedTextLinesResult() {};
+
+			/**
+			* Gets the hash ID of the source image.
+			*
+			* @return Returns a pointer to a null-terminated string containing the hash ID of the source image.
+			*
+			*/
+			virtual const char* GetSourceImageHashId() const = 0;
+
+			/**
+			* Gets the tag of the source image.
+			*
+			* @return Returns a pointer to a CImageTag object representing the tag of the source image.
+			*
+			*/
+			virtual const CImageTag* GetSourceImageTag() const = 0;
+
+			/**
+			 * Get the rotation transformation matrix of the original image relative to the rotated image.
+			 *
+			 * @param [out] matrix A double array which represents the rotation transform matrix.
+			 *
+			 */
+			virtual void GetRotationTransformMatrix(double matrix[9]) const = 0;
+
+			/**
+			* Gets the number of text line result items in the recognition result.
+			*
+			* @return Returns the number of text line result items in the recognition result.
+			*
+			*/
+			virtual int GetCount() const = 0;
+
+			/**
+			* Gets the text line result item at the specified index.
+			*
+			* @param [in] index The zero-based index of the text line result item to retrieve.
+			*
+			* @return Returns a pointer to the CTextLineResultItem object at the specified index.
+			*
+			*/
+			virtual const CTextLineResultItem* GetItem(int index) const = 0;
+
+			/**
+			 * Remove a specific item from the array in the recognition result.
+			 *
+			 * @param [in] item The specific item to remove.
+			 *
+			 * @return Returns value indicating whether the deletion was successful or not.
+			 *
+			 */
+			virtual int RemoveItem(const CTextLineResultItem* item) = 0;
+
+			/**
+			 * Check if the item is present in the array.
+			 *
+			 * @param [in] item The specific item to check.
+			 *
+			 * @return Returns a bool value indicating whether the item is present in the array or not.
+			 *
+			 */
+			virtual bool HasItem(const CTextLineResultItem* item) const = 0;
+
+			/**
+			* Gets the error code of the recognition result, if an error occurred.
+			*
+			* @return Returns the error code of the recognition result, or 0 if no error occurred.
+			*
+			*/
+			virtual int GetErrorCode() const = 0;
+
+			/**
+			* Gets the error message of the recognition result, if an error occurred.
+			*
+			* @return Returns a pointer to a null-terminated string containing the error message of the recognition result, or a pointer to an empty string if no error occurred.
+			*
+			*/
+			virtual const char* GetErrorString() const = 0;
+		};
+
+		/**
+		 * The CLabelRecognizerModule class defines general functions in the label recognizer module.
+		 */
+		class DLR_API CLabelRecognizerModule
+		{
+		public:
+			/**
+			 * Returns the version of the label recognizer module.
+			 *
+			 * @return Returns a const char pointer representing the version of the label recognizer module.
+			 */
+			static const char* GetVersion();
+		};
+
 	}
 }
 #endif

@@ -1,23 +1,22 @@
-# Dynamsoft Label Recognizer samples for C/C++ edition
+# Dynamsoft Label Recognizer samples for C++ edition
 
-This repository contains multiple samples that demonstrate how to use the [Dynamsoft Label Recognizer](https://www.dynamsoft.com/label-recognition/overview/) C/C++ Edition.
+This repository contains multiple samples that demonstrate how to use the [Dynamsoft Label Recognizer](https://www.dynamsoft.com/label-recognition/overview/) C++ Edition.
 
 ## Requirements
 
 - Windows
   - Windows 7, 8, 10, 2003, 2008, 2008 R2, 2012.
-  - Visual Studio 2008 or above
+  - Visual Studio 2012 or above
 - Linux
   - Linux x64: Ubuntu 14.04.4+ LTS, Debian 8+, etc.
-  - GCC 4.2+
+  - GCC 5.4+
 
 ## Samples
 
 | Sample            | Description |
 |---------------|----------------------|
-|C/HelloWorld       | This is a C sample that illustrates the simplest way to recognize text from an image file with Dynamsoft Label Recognizer SDK. |
-|C++/HelloWorld          | This is a C++ sample that illustrates the simplest way to recognize text from an image file  with Dynamsoft Label Recognizer SDK.            |
-|C++/MRZScanner        | This C++ sample detects the machine readable zone of a id card/visa/passport, recognize the text, and parse the data into surname, given name, nationality, passport number, issuing country or organization, date of birth, sex/gender, and expiration date.                 |
+|[HelloWorld/RecognizeAnImage](Samples/HelloWorld/RecognizeAnImage)          | This is a C++ sample that illustrates the simplest way to recognize text from an image file with Dynamsoft Label Recognizer SDK.            |
+|[HelloWorld/RecognizeMultipleImages](Samples/HelloWorld/RecognizeMultipleImages)           | This is a C++ sample that illustrates the simplest way to recognize text from images file in a directory with Dynamsoft Label Recognizer SDK.            |
 
 ## License
 
