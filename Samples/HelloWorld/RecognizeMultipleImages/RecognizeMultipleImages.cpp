@@ -46,7 +46,7 @@ class MyResultReceiver : public CCapturedResultReceiver
 public:
 	virtual void OnRecognizedTextLinesReceived(const CRecognizedTextLinesResult* pResult)
 	{
-		const CFileImageTag *tag = dynamic_cast<const CFileImageTag*>(pResult->GetSourceImageTag());
+		const CFileImageTag *tag = dynamic_cast<const CFileImageTag*>(pResult->GetOriginalImageTag());
 
 		cout << "File: " << tag->GetFilePath() << endl;
 
@@ -56,7 +56,7 @@ public:
 		}
 		else
 		{
-			int lCount = pResult->GetCount();
+			int lCount = pResult->GetItemsCount();
 			cout << "Recognized " << lCount << " lines" << endl;
 			for (int li = 0; li < lCount; ++li)
 			{

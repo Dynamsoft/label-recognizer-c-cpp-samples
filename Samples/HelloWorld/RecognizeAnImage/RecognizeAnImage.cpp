@@ -45,7 +45,7 @@ int main()
 		cout << "Error: " << result->GetErrorCode() << "," << result->GetErrorString() << endl;
 	}
 
-	int count = result->GetCount();
+	int count = result->GetItemsCount();
 	cout << "Recognized " << count << " text lines" << endl;
 	for (int i = 0; i < count; i++) {
 		const CCapturedResultItem* item = result->GetItem(i);
