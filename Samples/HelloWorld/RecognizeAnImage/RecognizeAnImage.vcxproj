@@ -99,10 +99,9 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>
-        xcopy /y "$(SolutionDir)..\..\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
-        xcopy /y "$(SolutionDir)..\..\CharacterModel" "$(TargetDir)CharacterModel\"
-      </Command>
+      <Command>xcopy /y "$(SolutionDir)..\..\Distributables\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
+xcopy /y "$(SolutionDir)..\..\Distributables\CharacterModel" "$(TargetDir)CharacterModel\"
+xcopy /ys "$(SolutionDir)..\..\Distributables\*.json" "$(OutputPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -129,8 +128,9 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(SolutionDir)..\..\Lib\Windows\$(PlatformTarget)\*.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)..\..\CharacterModel" "$(TargetDir)CharacterModel\"</Command>
+      <Command>xcopy /y "$(SolutionDir)..\..\Distributables\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
+xcopy /y "$(SolutionDir)..\..\Distributables\CharacterModel" "$(TargetDir)CharacterModel\"
+xcopy /ys "$(SolutionDir)..\..\Distributables\*.json" "$(OutputPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -153,10 +153,9 @@ xcopy /y "$(SolutionDir)..\..\CharacterModel" "$(TargetDir)CharacterModel\"</Com
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>
-        xcopy /y "$(SolutionDir)..\..\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
-        xcopy /y "$(SolutionDir)..\..\CharacterModel" "$(TargetDir)CharacterModel\"
-      </Command>
+      <Command>xcopy /y "$(SolutionDir)..\..\Distributables\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
+xcopy /y "$(SolutionDir)..\..\Distributables\CharacterModel" "$(TargetDir)CharacterModel\"
+xcopy /ys "$(SolutionDir)..\..\Distributables\*.json" "$(OutputPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -182,10 +181,9 @@ xcopy /y "$(SolutionDir)..\..\CharacterModel" "$(TargetDir)CharacterModel\"</Com
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>
-        xcopy /y "$(SolutionDir)..\..\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
-        xcopy /y "$(SolutionDir)..\..\CharacterModel" "$(TargetDir)CharacterModel\"
-      </Command>
+      <Command>xcopy /y "$(SolutionDir)..\..\Distributables\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
+xcopy /y "$(SolutionDir)..\..\Distributables\CharacterModel" "$(TargetDir)CharacterModel\"
+xcopy /ys "$(SolutionDir)..\..\Distributables\*.json" "$(OutputPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

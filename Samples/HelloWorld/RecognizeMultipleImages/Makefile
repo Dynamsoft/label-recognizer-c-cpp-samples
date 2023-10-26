@@ -1,8 +1,9 @@
 CC=gcc
 CCFLAGS=-c -std=c++11
 
-DLRMODEL_PATH=../../../CharacterModel
-DS_LIB_PATH="../../../Lib/Linux/x64"
+DLRMODEL_PATH=../../../Distributables/CharacterModel
+DS_LIB_PATH=../../../Distributables/Lib/Linux/x64
+DS_JSON_PATH=../../../Distributables/DLR-PresetTemplates.json
 LDFLAGS=-L $(DS_LIB_PATH) -Wl,-rpath=$(DS_LIB_PATH) -Wl,-rpath=./
 DS_LIB=-lDynamsoftCaptureVisionRouter -lDynamsoftCore -lDynamsoftUtility -lDynamsoftLicense
 
@@ -16,6 +17,7 @@ SOURCE=RecognizeMultipleImages.cpp
 $(TARGET): $(OBJECT)
 	$(CC) -o $(TARGET) $(OBJECT) $(STDLIB) $(DS_LIB) $(LDFLAGS)
 	cp -r $(DLRMODEL_PATH) $(DS_LIB_PATH)
+	cp  $(DS_JSON_PATH) $(DS_LIB_PATH)
 
 # target to build an object file
 $(OBJECT): $(SOURCE)
