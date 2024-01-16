@@ -15,8 +15,8 @@ This repository contains multiple samples that demonstrate how to use the [Dynam
 
 | Sample            | Description |
 |---------------|----------------------|
-|[HelloWorld\RecognizeAnImage](Samples\HelloWorld\RecognizeAnImage)          | This is a C++ sample that illustrates the simplest way to recognize text from an image file with Dynamsoft Label Recognizer SDK.            |
-|[HelloWorld\RecognizeMultipleImages(Samples\HelloWorld\RecognizeMultipleImages)           | This is a C++ sample that illustrates the simplest way to recognize text from images file in a directory with Dynamsoft Label Recognizer SDK.            |
+|[`RecognizeAnImage`](Samples/HelloWorld/RecognizeAnImage)          | This is a C++ sample that illustrates the simplest way to recognize text from an image file with Dynamsoft Label Recognizer SDK.            |
+|[`RecognizeMultipleImages`](Samples/HelloWorld/RecognizeMultipleImages)           | This is a C++ sample that illustrates the simplest way to recognize text from images file in a directory with Dynamsoft Label Recognizer SDK.            |
 
 ## License
 
