@@ -59,8 +59,10 @@ int main()
 	}
 
 	// 5. Release the allocated memory.
+	if (result)
+		result->Release();
 	delete router, router = NULL;
-	delete result, result = NULL;
+	
 	
 	return 0;
 }
