@@ -25,7 +25,7 @@
 #include "DynamsoftCodeParser.h"
 #include "DynamsoftLicense.h"
 
-#define DCV_VERSION                  "2.2.20.0325"
+#define DCV_VERSION                  "2.2.30.0743"
 
 /**Enumeration section*/
 
