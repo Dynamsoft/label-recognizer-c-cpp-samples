@@ -1,5 +1,5 @@
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <string>
 
 #include "../../../Include/DynamsoftCaptureVisionRouter.h"
 
@@ -25,44 +25,51 @@ int main()
 	char error[512];
 
 	// 1.Initialize license.
-	// You can request and extend a trial license from https://www.dynamsoft.com/customer/license/trialLicense?product=dlr&utm_source=samples
+	// You can request and extend a trial license from https://www.dynamsoft.com/customer/license/trialLicense?product=dlr&utm_source=samples&package=c_cpp
 	// The string 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9' here is a free public trial license. Note that network connection is required for this license to work.
 	errorcode = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", error, 512);
-
-	cout << "License initialization: " << errorcode << "," << error << endl;
-
-	// 2.Create an instance of CCaptureVisionRouter.
-	CCaptureVisionRouter *router = new CCaptureVisionRouter;
-
-	// 3.Recognize text from an image
-	string imageFile = "../../../Images/dlr-sample.png";
-	CCapturedResult* result = router->Capture(imageFile.c_str(), CPresetTemplate::PT_RECOGNIZE_TEXT_LINES);
-
-	cout << "File: " << imageFile << endl;
-
-	// 4.Output the recognized text.
-	if (result->GetErrorCode() != 0) {
-		cout << "Error: " << result->GetErrorCode() << "," << result->GetErrorString() << endl;
+	if (errorcode != ErrorCode::EC_OK && errorcode != ErrorCode::EC_LICENSE_CACHE_USED)
+	{
+		cout << "License initialization failed: ErrorCode: " << errorcode << ", ErrorString: " << error << endl;
 	}
+	else
+	{
+		// 2.Create an instance of CCaptureVisionRouter.
+		CCaptureVisionRouter *router = new CCaptureVisionRouter;
 
-	int count = result->GetItemsCount();
-	cout << "Recognized " << count << " text lines" << endl;
-	for (int i = 0; i < count; i++) {
-		const CCapturedResultItem* item = result->GetItem(i);
+		// 3.Recognize text from an image
+		string imageFile = "../../../Images/dlr-sample.png";
+		CCapturedResult *result = router->Capture(imageFile.c_str(), CPresetTemplate::PT_RECOGNIZE_TEXT_LINES);
 
-		CapturedResultItemType type = item->GetType();
-		if (type == CapturedResultItemType::CRIT_TEXT_LINE) {
-			const CTextLineResultItem* textLine = dynamic_cast<const CTextLineResultItem*>(item);
+		cout << "File: " << imageFile << endl;
 
-			cout << ">>Line result " << i << ": " << textLine->GetText() << endl;
+		// 4.Output the recognized text.
+		if (result->GetErrorCode() != 0)
+		{
+			cout << "Error: " << result->GetErrorCode() << "," << result->GetErrorString() << endl;
 		}
-	}
+		CRecognizedTextLinesResult *textLinesResult = result->GetRecognizedTextLinesResult();
+		if (textLinesResult == nullptr || textLinesResult->GetItemsCount() == 0)
+		{
+			cout << "No text line found." << endl;
+		}
+		else
+		{
+			int count = textLinesResult->GetItemsCount();
+			cout << "Recognized " << count << " text lines" << endl;
+			for (int i = 0; i < count; i++)
+			{
+				const CTextLineResultItem *textLine = textLinesResult->GetItem(i);
+				cout << ">>Line result " << i << ": " << textLine->GetText() << endl;
+			}
+		}
 
-	// 5. Release the allocated memory.
-	if (result)
-		result->Release();
-	delete router, router = NULL;
-	
-	
-	return 0;
+		// 5. Release the allocated memory.
+		if (textLinesResult)
+			textLinesResult->Release();
+		if (result)
+			result->Release();
+		delete router, router = NULL;
+	}
+		return 0;
 }

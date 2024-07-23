@@ -1,4 +1,4 @@
-#include<iostream>
+#include <iostream>
 
 #include "../../../Include/DynamsoftCaptureVisionRouter.h"
 #include "../../../Include/DynamsoftUtility.h"
@@ -28,10 +28,11 @@ using namespace dynamsoft::utility;
 class MyImageSourceStateListener : public CImageSourceStateListener
 {
 private:
-	CCaptureVisionRouter* m_router;
+	CCaptureVisionRouter *m_router;
 
 public:
-	MyImageSourceStateListener(CCaptureVisionRouter* router) {
+	MyImageSourceStateListener(CCaptureVisionRouter *router)
+	{
 		m_router = router;
 	}
 
@@ -45,9 +46,9 @@ public:
 class MyResultReceiver : public CCapturedResultReceiver
 {
 public:
-	virtual void OnRecognizedTextLinesReceived(CRecognizedTextLinesResult* pResult)
+	virtual void OnRecognizedTextLinesReceived(CRecognizedTextLinesResult *pResult)
 	{
-		const CFileImageTag *tag = dynamic_cast<const CFileImageTag*>(pResult->GetOriginalImageTag());
+		const CFileImageTag *tag = dynamic_cast<const CFileImageTag *>(pResult->GetOriginalImageTag());
 
 		cout << "File: " << tag->GetFilePath() << endl;
 
@@ -61,7 +62,7 @@ public:
 			cout << "Recognized " << lCount << " lines" << endl;
 			for (int li = 0; li < lCount; ++li)
 			{
-				const CTextLineResultItem* textLine = pResult->GetItem(li);
+				const CTextLineResultItem *textLine = pResult->GetItem(li);
 				cout << ">>Line result " << li << ": " << textLine->GetText() << endl;
 			}
 		}
@@ -76,38 +77,41 @@ int main()
 	char error[512];
 
 	// 1.Initialize license.
-	// You can request and extend a trial license from https://www.dynamsoft.com/customer/license/trialLicense?product=dlr&utm_source=samples
+	// You can request and extend a trial license from https://www.dynamsoft.com/customer/license/trialLicense?product=dlr&utm_source=samples&package=c_cpp
 	// The string 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9' here is a free public trial license. Note that network connection is required for this license to work.
 	errorcode = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", error, 512);
+	if (errorcode != ErrorCode::EC_OK && errorcode != ErrorCode::EC_LICENSE_CACHE_USED)
+	{
+		cout << "License initialization failed: ErrorCode: " << errorcode << ", ErrorString: " << error << endl;
+	}
+	else
+	{
+		// 2.Create an instance of CCaptureVisionRouter.
+		CCaptureVisionRouter *router = new CCaptureVisionRouter;
 
-	cout << "License initialization: " << errorcode << "," << error << endl;
+		// 3.Set input image source
+		CDirectoryFetcher *dirFetcher = new CDirectoryFetcher;
+		// Replace it with your image directory
+		dirFetcher->SetDirectory("../../../Images");
 
-	// 2.Create an instance of CCaptureVisionRouter.
-	CCaptureVisionRouter *router = new CCaptureVisionRouter;
+		router->SetInput(dirFetcher);
 
-	// 3.Set input image source
-	CDirectoryFetcher *dirFetcher = new CDirectoryFetcher;
-	// Replace it with your image directory
-	dirFetcher->SetDirectory("../../../Images");
+		// 4. Add image source state listener
+		CImageSourceStateListener *listener = new MyImageSourceStateListener(router);
+		router->AddImageSourceStateListener(listener);
 
-	router->SetInput(dirFetcher);
+		// 5. Add captured result receiver
+		CCapturedResultReceiver *recv = new MyResultReceiver;
+		router->AddResultReceiver(recv);
 
-	// 4. Add image source state listener
-	CImageSourceStateListener *listener = new MyImageSourceStateListener(router);
-	router->AddImageSourceStateListener(listener);
+		// 6. Start capturing
+		router->StartCapturing(CPresetTemplate::PT_RECOGNIZE_TEXT_LINES, true);
 
-	// 5. Add captured result receiver
-	CCapturedResultReceiver *recv = new MyResultReceiver;
-	router->AddResultReceiver(recv);
-
-	// 6. Start capturing
-	router->StartCapturing(CPresetTemplate::PT_RECOGNIZE_TEXT_LINES, true);
-
-	// 7. Release the allocated memory.
-	delete router, router = NULL;
-	delete dirFetcher, dirFetcher = NULL;
-	delete listener, listener = NULL;
-	delete recv, recv = NULL;
-	
+		// 7. Release the allocated memory.
+		delete router, router = NULL;
+		delete dirFetcher, dirFetcher = NULL;
+		delete listener, listener = NULL;
+		delete recv, recv = NULL;
+	}
 	return 0;
 }
